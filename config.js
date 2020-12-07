@@ -1,7 +1,7 @@
 exports.mysqlConfig = {
-    host: 'localhost',
-    port:'3306',
+    host: 'jirancloud.com',
+    port:'4406',
     user: 'root',
-    password: 'root',
-    database: 'going-web'
+    password: 'wenpanhuihui520',
+    database: 'personal_practice'
 }

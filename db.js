@@ -14,7 +14,6 @@ exports.exec=(sql,values)=>{
             if(error) reject(error)
             resolve(results)
         })
-    })
 }
 
 
