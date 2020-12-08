@@ -5,3 +5,5 @@ exports.mysqlConfig = {
     password: 'wenpanhuihui520',
     database: 'personal_practice'
 }
+
+exports.secret=`fuck anything whatever the gods think`

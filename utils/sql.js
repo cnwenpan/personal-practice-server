@@ -1,5 +1,5 @@
 exports.programList = `select * from program`;
-exports.programAdd = `insert into program(id,name,des) values(?,?,?)`;
+exports.programAdd = `insert into program(id,name,level,end_time,create_time,user_id) values(?,?,?,?,?,?)`;
 exports.programHas = `select id from program where name= ? `;
 exports.programDel = `delete from program where id= ? `;
 exports.programDetail=`SELECT * FROM program WHERE id= `;
