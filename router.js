@@ -2,8 +2,14 @@
 const router = require('koa-router')();
 const program =require('./controller/program.js')
 const task = require('./controller/task.js')
+const account = require('./controller/account')
+
 
 // add url-route:
+router.post('/account/register',account.register)
+router.post('/account/login',account.login)
+
+//
 router.get('/program/list', program.list);
 router.post('/program/add',program.add)
 router.post('/program/del',program.del)

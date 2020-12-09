@@ -1,16 +1,15 @@
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser')
-var cors = require('koa2-cors');
+const cors = require('koa2-cors');
 const log4js = require('koa-log4')
 const jwt = require('jsonwebtoken')
-const {secret} = require('./config')
+const {secret,whiteInventory} = require('./config')
 const app = new Koa();
 
 // 路由
 const router = require('./router.js')
 
 app.use(log4js.koaLogger(log4js.getLogger("http"), {level: 'info'}))
-
 
 // 允许跨域
 app.use(cors({
@@ -29,32 +28,37 @@ app.use(bodyParser({enableTypes: ['json', 'form', 'text']}))
 
 app.use((ctx, next) => {
 //验证token
-    const token = ctx.cookies.get('token')
-    if (!token) {
-        ctx.body = {
-            code: 1001,
-            message: '请先登录'
-        }
+    const requestUrl = ctx.request.originalUrl;
+    //白名单 ，不验证token
+    if (whiteInventory.indexOf(requestUrl) > -1) {
+        next()
     } else {
-        let decoded
-        try{
-            decoded = jwt.verify(token, secret)
-            if (!decoded.userId) {
-                ctx.body = {
-                    code: 1002,
-                    message: '登录异常，请重新登录'
-                }
-            }else{
-                next()
-            }
-        }catch (e){
+        const token = ctx.cookies.get('token')
+        if (!token) {
             ctx.body = {
-                code: 1003,
-                message: e
+                code: 1001,
+                message: '请先登录'
+            }
+        } else {
+            let decoded
+            try {
+                decoded = jwt.verify(token, secret)
+                if (!decoded.user_id) {
+                    ctx.body = {
+                        code: 1002,
+                        message: '登录异常，请重新登录'
+                    }
+                } else {
+                    ctx.state.account=decoded;
+                    next()
+                }
+            } catch (e) {
+                ctx.body = {
+                    code: 1003,
+                    message: e
+                }
             }
         }
-
-
     }
 
 
