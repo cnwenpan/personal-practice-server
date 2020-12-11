@@ -9,5 +9,5 @@ exports.taskAdd = `insert into task(id,name,des,programId,type,duration,status,t
 exports.taskDel=`delete id from task where id= ?`;
 
 //
-exports.accountDetail=`select * form account where account= ?`;
+exports.accountDetail=`select * from account where account= ?`;
 exports.accountAdd=`insert into account(id,type,user_id,account,password,phone,email,nikName,name,create_time) values(?,?,?,?,?,?,?,?,?,?)`

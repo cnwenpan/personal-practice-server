@@ -6,47 +6,54 @@ const {secret} = require('../config')
 exports.login = async (ctx, next) => {
     const {account, password} = ctx.request.body;
 
-    if (!account) {
+    if (account) {
         const {error, data} = await db.exec(sql.accountDetail, [account]);
         if (error) {
             ctx.body = JSON.stringify({
                 success: false,
                 msg: data.toString()
             })
+        } else if (data.length === 0) {
+            ctx.body = JSON.stringify(
+                {
+                    success: false,
+                    msg: '账号不存在'
+                }
+            )
         } else {
 
+            const user = data[0]
             //对比密码
-            if (password === data.password) {
-                ctx.body = {
+            if (password === user.password) {
+                ctx.body = JSON.stringify({
                     success: true,
                     msg: '登录成功'
-                }
+                })
+
+                //加密
+                const token= jwt.sign({account: user.account, name: user.name, type: user.type}, secret)
                 //下发用户凭证
                 ctx.cookies.set(
                     'token',
-                    jwt.sign(data, secret),
+                    token,
                     {
-                        // domain:ctx.request.host,  // 写cookie所在的域名
+                        domain: 'localhost',  // 写cookie所在的域名
                         path: '/',       // 写cookie所在的路径
-                        maxAge: 60 * 60 * 24 * 10, // cookie有效时长
-                        expires: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 10)),  // cookie失效时间
+                        maxAge: 1000 * 60 * 60 * 24 * 10, // cookie有效时长
+                        // expires: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 10)),  // cookie失效时间
                         httpOnly: false,  // 是否只用于http请求中获取
                         overwrite: false  // 是否允许重写
                     }
                 )
 
             } else {
-                ctx.body = {
+                ctx.body = JSON.stringify({
                     success: false,
                     msg: '密码错误'
-                }
+                })
             }
         }
 
-        ctx.body = JSON.stringify({
-            success: true,
-            data: res
-        })
 
     } else {
         ctx.body = JSON.stringify({
@@ -58,40 +65,40 @@ exports.login = async (ctx, next) => {
     next()
 }
 
-exports.register=async (ctx,next)=>{
-    const {account,password,phone,email,nikName,name}=ctx.body;
+exports.register = async (ctx, next) => {
+    const {account, password, phone = '', email = '', nikName = '', name = ''} = ctx.request.body;
 
     // 检查账号
-    if(!account){
-        ctx.body={
-            success:false,
-            msg:'账号不能为空'
-        }
+    if (!account) {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: '账号不能为空'
+        })
         next()
         return
     }
-    if(!password){
-        ctx.body={
-            success:false,
-            msg:'密码不能为空'
-        }
+    if (!password) {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: '密码不能为空'
+        })
         next()
         return
     }
     //type,user_id,account,password,phone,email,nikName,name,create_time
-    const {error,data}= await db.exec(sql.accountDetail,[1,new Date().getTime(),account,password,phone,email,nikName,name,new Date().getTime()]);
+    const {error, data} = await db.exec(sql.accountAdd, [1, new Date().getTime(), account, password, phone, email, nikName, name, new Date()]);
 
-    if(error){
-        ctx.body={
-            success:false,
-            msg:data.toString()
-        }
-    }else{
+    if (error) {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: data.toString()
+        })
+    } else {
 
-        ctx.body={
-            success:true,
-            msg:'注册成功'
-        }
+        ctx.body = JSON.stringify({
+            success: true,
+            msg: '注册成功'
+        })
     }
     next()
 

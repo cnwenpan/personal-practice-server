@@ -9,6 +9,6 @@ exports.mysqlConfig = {
 exports.secret=`fuck anything whatever the gods think`
 
 exports.whiteInventory=[
-    '/account/login',
-    'account/register'
+    '/api/account/login',
+    '/api/account/register'
 ]

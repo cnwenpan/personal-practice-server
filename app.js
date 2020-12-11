@@ -26,12 +26,13 @@ app.use(cors({
 // http,body解析
 app.use(bodyParser({enableTypes: ['json', 'form', 'text']}))
 
-app.use((ctx, next) => {
+app.use(async (ctx, next) => {
+    console.log(ctx.url)
 //验证token
     const requestUrl = ctx.request.originalUrl;
     //白名单 ，不验证token
     if (whiteInventory.indexOf(requestUrl) > -1) {
-        next()
+        await next()
     } else {
         const token = ctx.cookies.get('token')
         if (!token) {
@@ -72,4 +73,4 @@ app.use(async ctx => {
     console.log(ctx.url)
 });
 
-app.listen(3000);
+app.listen(2083);

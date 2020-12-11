@@ -4,15 +4,19 @@ const sql = require('../utils/sql.js')
 // 查
 exports.list = async (ctx, next) => {
 
-    const res = await db.exec(sql.programList);
+    const {error, data} = await db.exec(sql.programList);
 
-    console.log('进了programlist',res)
-
-
-    ctx.body = JSON.stringify({
-        success: true,
-        data: res
-    })
+    if (error) {
+        ctx.body = {
+            success: false,
+            data: error.toString()
+        }
+    } else {
+        ctx.body = JSON.stringify({
+            success: true,
+            data: data
+        })
+    }
     next()
 }
 
@@ -28,57 +32,65 @@ exports.add = async (ctx, next) => {
         ctx.body = JSON.stringify({
             success: false
         })
-    } else {
+        next()
+        return
+    }
 
-        //  任务名，云重判断
-        const arr = await db.exec(sql.programHas, [name]).catch(e => {
-            console.log(e)
-            ctx.body = JSON.stringify({
-                success: false
-            })
+    //  任务名，云重判断
+    const {error, data} = await db.exec(sql.programHas, [name])
+
+    if (error) {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: data.toString()
         })
 
-        if (arr && arr.length > 0) {
+    } else {
+        if (data && data.length > 0) {
             ctx.body = JSON.stringify({
                 success: false,
                 msg: '项目名已经存在'
             })
-
+            next()
             return
         }
 
         // name,level,end_time,create_time,user_id
+        const {error, data} = await db.exec(sql.programAdd, [name, level, end_time, new Date()])
+        if (error) {
+            ctx.body = JSON.stringify({
+                success: false,
+                msg: data.toString()
+            })
 
-        await db.exec(sql.programAdd, [name, level,end_time,new Date()]).catch(
-            e => {
-                console.log(e)
-                ctx.body = JSON.stringify({
-                    success: false
-                })
-
-            }
-        );
-        ctx.body = JSON.stringify({
-            success: true
-        })
+        } else {
+            ctx.body = JSON.stringify({
+                success: true,
+                data,
+            })
+        }
     }
-    await next()
+    next()
 }
+
 // 删
 exports.del = async (ctx, next) => {
     const {id} = ctx.request.body;
     if (id) {
-        await db.exec(sql.programDel, [id]).catch(e => {
-            console.log(e)
+        const {error, data} = await db.exec(sql.programDel, [id])
+        if (error) {
             ctx.body = JSON.stringify({
                 success: false,
-                msg: '未知错误'
+                msg: data.toString()
             })
 
-        })
+            next()
+            return
+        }
 
         ctx.body = JSON.stringify({
             success: true,
+            msg: '操作成功'
         })
 
     } else {
@@ -87,35 +99,5 @@ exports.del = async (ctx, next) => {
             msg: 'id不能为空'
         })
     }
+    next()
 }
-
-
-// detail
-exports.detail = async (ctx, next) => {
-    const {id} = ctx.request.body;
-    if (id) {
-        const res = await db.exec(sql.programDetail, [id]).catch(e => {
-            console.log(e)
-            ctx.body = JSON.stringify({
-                success: false,
-                msg: '未知错误'
-            })
-
-        })
-
-        ctx.body = JSON.stringify({
-            success: true,
-            data: res
-        })
-
-    } else {
-        ctx.body = JSON.stringify({
-            success: false,
-            msg: 'id不能为空'
-        })
-    }
-
-    await next()
-}
-
-

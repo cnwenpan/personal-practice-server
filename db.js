@@ -11,7 +11,10 @@ exports.exec=(sql,values)=> {
             values.unshift(v4())
         }
         connection.query(sql, values, (error, results) => {
-            if (error) resolve({error:true,data:error})
+            if (error) {
+                console.log(error)
+                resolve({error:true,data:error})
+            }
             resolve({error:false,data:results})
         })
     })
