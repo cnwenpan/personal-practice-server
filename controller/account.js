@@ -31,7 +31,7 @@ exports.login = async (ctx, next) => {
                 })
 
                 //加密
-                const token= jwt.sign({account: user.account, name: user.name, type: user.type}, secret)
+                const token= jwt.sign({account: user.account, name: user.name, type: user.type,user_id:user.user_id}, secret)
                 //下发用户凭证
                 ctx.cookies.set(
                     'token',

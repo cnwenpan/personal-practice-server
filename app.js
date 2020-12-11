@@ -36,28 +36,32 @@ app.use(async (ctx, next) => {
     } else {
         const token = ctx.cookies.get('token')
         if (!token) {
-            ctx.body = {
+            ctx.body = JSON.stringify({
                 code: 1001,
-                message: '请先登录'
-            }
+                success:false,
+                msg: '请先登录'
+            })
         } else {
             let decoded
             try {
                 decoded = jwt.verify(token, secret)
                 if (!decoded.user_id) {
-                    ctx.body = {
-                        code: 1002,
-                        message: '登录异常，请重新登录'
-                    }
+                    ctx.body = JSON.stringify({
+                        code: 1001,
+                        success:false,
+                        msg: '登录异常，请重新登录'
+                    })
                 } else {
                     ctx.state.account=decoded;
-                    next()
+                    await next()
                 }
             } catch (e) {
-                ctx.body = {
-                    code: 1003,
-                    message: e
-                }
+                console.log(e)
+                ctx.body = JSON.stringify({
+                    code: 1002,
+                    success:false,
+                    msg: e.toString()
+                })
             }
         }
     }

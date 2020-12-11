@@ -9,7 +9,7 @@ exports.list = async (ctx, next) => {
     if (error) {
         ctx.body = {
             success: false,
-            data: error.toString()
+            data: data.toString()
         }
     } else {
         ctx.body = JSON.stringify({
@@ -25,12 +25,23 @@ exports.add = async (ctx, next) => {
     const {
         name,
         level,
-        end_time
+        userId,
+        endTime: end_time
     } = ctx.request.body;
 
     if (!name) {
         ctx.body = JSON.stringify({
-            success: false
+            success: false,
+            msg: '项目名不能为空'
+        })
+        next()
+        return
+    }
+
+    if (!level) {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: '优先级不能为空'
         })
         next()
         return
@@ -56,17 +67,16 @@ exports.add = async (ctx, next) => {
         }
 
         // name,level,end_time,create_time,user_id
-        const {error, data} = await db.exec(sql.programAdd, [name, level, end_time, new Date()])
+        const {error, data: result} = await db.exec(sql.programAdd, [name, level, new Date(end_time), new Date(), ctx.state.account.user_id])
         if (error) {
             ctx.body = JSON.stringify({
                 success: false,
-                msg: data.toString()
+                msg: result.toString()
             })
 
         } else {
             ctx.body = JSON.stringify({
                 success: true,
-                data,
             })
         }
     }
@@ -93,6 +103,53 @@ exports.del = async (ctx, next) => {
             msg: '操作成功'
         })
 
+    } else {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: 'id不能为空'
+        })
+    }
+    next()
+}
+
+exports.update = async (ctx, next) => {
+    const {id, name, level, endTime} = ctx.request.body;
+    if (id) {
+        const {error, data} = await db.exec(sql.programUpdate, [name, level, endTime, id])
+        if (!error) {
+            ctx.body = JSON.stringify({
+                success: true,
+                msg: '修改成功'
+            })
+        } else {
+            ctx.body = JSON.stringify({
+                success: false,
+                msg: data.toString()
+            })
+        }
+    } else {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: 'id不能为空'
+        })
+    }
+    next()
+}
+exports.startUp = async (ctx, next) => {
+    const {id} = ctx.request.body;
+    if (id) {
+        const {error, data} = await db.exec(sql.programStartUp, [new Date(), id])
+        if (!error) {
+            ctx.body = JSON.stringify({
+                success: true,
+                msg: '启动成功'
+            })
+        } else {
+            ctx.body = JSON.stringify({
+                success: false,
+                msg: data.toString()
+            })
+        }
     } else {
         ctx.body = JSON.stringify({
             success: false,

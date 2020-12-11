@@ -11,9 +11,11 @@ router.post(schame+'/account/register',account.register)
 router.post(schame+'/account/login',account.login)
 
 //
-router.get('/program/list', program.list);
+router.post(schame+'/program/list', program.list);
 router.post(schame+'/program/add',program.add)
 router.post(schame+'/program/del',program.del)
+router.post(schame+'/program/update',program.update)
+router.post(schame+'/program/startUp',program.startUp)
 
 //task
 router.post(schame+'/task/list',task.list)
