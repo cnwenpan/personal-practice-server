@@ -4,7 +4,7 @@ const sql = require('../utils/sql.js')
 // 查
 exports.list = async (ctx, next) => {
 
-    const {error, data} = await db.exec(sql.programList);
+    const {error, data} = await db.exec(sql.programList,[ctx.state.account.user_id]);
 
     if (error) {
         ctx.body = {

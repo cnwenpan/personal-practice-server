@@ -3,6 +3,7 @@ const router = require('koa-router')();
 const program =require('./controller/program.js')
 const task = require('./controller/task.js')
 const account = require('./controller/account')
+const landMasks = require('./controller/landMasks')
 
 const schame='/api'
 
@@ -17,6 +18,10 @@ router.post(schame+'/program/del',program.del)
 router.post(schame+'/program/update',program.update)
 router.post(schame+'/program/startUp',program.startUp)
 
+//landmasks
+router.post(schame+'/landMasks/list',landMasks.list)
+router.post(schame+'/landMasks/add',landMasks.add)
+router.post(schame+'/landMasks/update',landMasks.update)
 //task
 router.post(schame+'/task/list',task.list)
 router.post(schame+'/task/add',task.add)
