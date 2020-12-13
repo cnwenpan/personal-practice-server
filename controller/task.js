@@ -3,93 +3,169 @@ const sql = require('../utils/sql.js')
 
 // 查
 exports.list = async (ctx, next) => {
-    const {
-        programId,
-    } = ctx.request.body;
 
-    const res = await db.exec(sql.taskList,[programId]);
+    const {landMarkId} = ctx.request.body;
+    if (landMarkId) {
+        const {error, data} = await db.exec(sql.taskList, [landMarkId]);
 
-    await next()
+        if (error) {
+            ctx.body = {
+                success: false,
+                data: data.toString()
+            }
+        } else {
+            ctx.body = JSON.stringify({
+                success: true,
+                data: data
+            })
+        }
+    } else {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: 'landMarkId不能为空'
+        })
+    }
 
-    ctx.body = JSON.stringify({
-        success: true,
-        data: res
-    })
+
+    next()
 }
 
 // 增
 exports.add = async (ctx, next) => {
     const {
-        programId,
+        landMarkId,
         name,
-        des,
-        type,duration,status,time
+        startTime,
+        repeat,
+        targets,
+        description
     } = ctx.request.body;
-    
-    if (!name||!programId) {
+
+    if (!landMarkId) {
         ctx.body = JSON.stringify({
             success: false,
-            msg:'参数错误'
+            msg: 'landMarkId不能为空'
         })
-    } else {
-
-        const arr = await db.exec(sql.taskHas, [name]).catch(e => {
-            ctx.body = JSON.stringify({
-                success: false,
-                msg:'数据库异常'
-            })
-        })
-
-        if(arr&&arr.length>0){
-            ctx.body = JSON.stringify({
-                success: false,
-                msg:'任务已经存在'
-            })
-
-            return
-        }
-        await db.exec(sql.taskAdd, [name, des,programId,type,duration,status,time]).catch( 
-            e => {
-                console.log(e)
-                ctx.body = JSON.stringify({
-                    success: false,
-                    msg:'数据库异常'
-                })
-
-            }
-        );
-        ctx.body = JSON.stringify({
-            success: true
-        })
+        next()
+        return
     }
-    await next()
-}
-// 删
-exports.del= async (ctx,next)=>{
-    const {id} = ctx.request.body;
-    if(id){
-       await db.exec(sql.taskDel,[id]).catch(e=>{
-            console.log(e)
-                ctx.body = JSON.stringify({
-                    success: false,
-                    msg:'未知错误'
-                })
 
+    if (!name) {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: '任务名不能为空'
+        })
+        next()
+        return
+    }
+
+    if (!startTime) {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: '时间不能为空'
+        })
+        next()
+        return
+    }
+
+
+    // name,level,end_time,create_time,user_id
+    const {error, data} = await db.exec(sql.taskAdd, [name, new Date(startTime),Number(repeat),Number(targets),description ,new Date(),landMarkId ,0])
+    if (error) {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: data.toString()
         })
 
+    } else {
         ctx.body = JSON.stringify({
             success: true,
         })
-
-    }else{
-        ctx.body = JSON.stringify({
-            success: false,
-            msg:'id不能为空'
-        })
     }
+
+    next()
 }
 
+// 删
+exports.del = async (ctx, next) => {
+    const {id} = ctx.request.body;
+    if (id) {
+        const {error, data} = await db.exec(sql.taskDel, [id])
+        if (error) {
+            ctx.body = JSON.stringify({
+                success: false,
+                msg: data.toString()
+            })
 
-// 改
+            next()
+            return
+        }
+
+        ctx.body = JSON.stringify({
+            success: true,
+            msg: '操作成功'
+        })
+
+    } else {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: 'id不能为空'
+        })
+    }
+    next()
+}
+
+exports.update = async (ctx, next) => {
+    const {
+        id,
+        name,
+        startTime,
+        repeat,
+        targets,
+        description
+    } = ctx.request.body;
+
+    if (!id) {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: 'taskId不能为空'
+        })
+        next()
+        return
+    }
+
+    if (!name) {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: '任务名不能为空'
+        })
+        next()
+        return
+    }
+
+    if (!startTime) {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: '时间不能为空'
+        })
+        next()
+        return
+    }
 
 
+    // name,level,end_time,create_time,user_id
+    const {error, data} = await db.exec(sql.taskUpdate, [name, new Date(startTime),Number(repeat),Number(targets),description,id])
+    if (error) {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: data.toString()
+        })
+
+    } else {
+        ctx.body = JSON.stringify({
+            success: true,
+        })
+    }
+
+    next()
+}

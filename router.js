@@ -25,6 +25,8 @@ router.post(schame+'/landMasks/update',landMasks.update)
 //task
 router.post(schame+'/task/list',task.list)
 router.post(schame+'/task/add',task.add)
+router.post(schame+'/task/update',task.update)
+router.post(schame+'/task/del',task.del)
 
 // consul健康检查
 router.get('/health/',async (ctx, next)=>{
