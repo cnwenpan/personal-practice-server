@@ -4,6 +4,7 @@ const program =require('./controller/program.js')
 const task = require('./controller/task.js')
 const account = require('./controller/account')
 const landMasks = require('./controller/landMasks')
+const operate= require('./controller/operate')
 
 const schame='/api'
 
@@ -27,6 +28,10 @@ router.post(schame+'/task/list',task.list)
 router.post(schame+'/task/add',task.add)
 router.post(schame+'/task/update',task.update)
 router.post(schame+'/task/del',task.del)
+router.post(schame+'/task/updateStatus',task.updateStatus)
+
+//
+router.post(schame+'/today',operate.todayTasks)
 
 // consul健康检查
 router.get('/health/',async (ctx, next)=>{

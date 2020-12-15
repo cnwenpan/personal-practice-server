@@ -38,6 +38,7 @@ exports.add = async (ctx, next) => {
         startTime,
         repeat,
         targets,
+        time_of_day,
         description
     } = ctx.request.body;
 
@@ -70,7 +71,7 @@ exports.add = async (ctx, next) => {
 
 
     // name,level,end_time,create_time,user_id
-    const {error, data} = await db.exec(sql.taskAdd, [name, new Date(startTime),Number(repeat),Number(targets),description ,new Date(),landMarkId ,0])
+    const {error, data} = await db.exec(sql.taskAdd, [name, new Date(startTime), Number(repeat),Number(time_of_day), Number(targets), description, new Date(), landMarkId, 0])
     if (error) {
         ctx.body = JSON.stringify({
             success: false,
@@ -122,6 +123,7 @@ exports.update = async (ctx, next) => {
         startTime,
         repeat,
         targets,
+        time_of_day,
         description
     } = ctx.request.body;
 
@@ -154,7 +156,7 @@ exports.update = async (ctx, next) => {
 
 
     // name,level,end_time,create_time,user_id
-    const {error, data} = await db.exec(sql.taskUpdate, [name, new Date(startTime),Number(repeat),Number(targets),description,id])
+    const {error, data} = await db.exec(sql.taskUpdate, [name, new Date(startTime), Number(repeat),Number(time_of_day), Number(targets), description, id])
     if (error) {
         ctx.body = JSON.stringify({
             success: false,
@@ -167,5 +169,33 @@ exports.update = async (ctx, next) => {
         })
     }
 
+    next()
+}
+
+exports.updateStatus = async (ctx, next) => {
+    //状态默认未完成。
+    const {taskId, status = 0} = ctx.request.body;
+    if (taskId) {
+
+        const {error, data} = await db.exec('update task set status=? where id=?', [status, taskId])
+        if (!error) {
+            ctx.body = JSON.stringify({
+                success: true,
+                msg: '更新成功'
+            })
+
+        } else {
+            ctx.body = JSON.stringify({
+                success: false,
+                msg: data.toString()
+            })
+        }
+
+    } else {
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: 'taskId不能为空'
+        })
+    }
     next()
 }
