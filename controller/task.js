@@ -39,6 +39,7 @@ exports.add = async (ctx, next) => {
         repeat,
         targets,
         time_of_day,
+        programId,
         description
     } = ctx.request.body;
 
@@ -71,7 +72,7 @@ exports.add = async (ctx, next) => {
 
 
     // name,level,end_time,create_time,user_id
-    const {error, data} = await db.exec(sql.taskAdd, [name, new Date(startTime), Number(repeat),Number(time_of_day), Number(targets), description, new Date(), landMarkId, 0])
+    const {error, data} = await db.exec(sql.taskAdd, [name, new Date(startTime), Number(repeat),Number(time_of_day), Number(targets), description, new Date(), landMarkId,programId, 0])
     if (error) {
         ctx.body = JSON.stringify({
             success: false,

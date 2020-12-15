@@ -9,7 +9,7 @@ exports.programStartUp = `update program set start_time= ? WHERE id = ? `
 //
 exports.taskList = `select * from task where landmarks_id= ?`;
 exports.taskHas = `select id from task where name= ? `;
-exports.taskAdd = `insert into task(id,name,start_time,is_repeat,time_of_day,targets,description,create_time,landmarks_id,status) values(?,?,?,?,?,?,?,?,?,?)`;
+exports.taskAdd = `insert into task(id,name,start_time,is_repeat,time_of_day,targets,description,create_time,landmarks_id,program_id,status) values(?,?,?,?,?,?,?,?,?,?,?)`;
 exports.taskUpdate = `update task set name = ?,start_time= ?,is_repeat=?,time_of_day=?,targets=?,description=? WHERE id = ?`
 exports.taskDel = `delete from task where id= ?`;
 
