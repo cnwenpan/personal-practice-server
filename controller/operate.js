@@ -23,6 +23,7 @@ exports.todayTasks = async (ctx, next) => {
             task.status status,
             program.name programName,
             program.level level,
+            program.start_time programStatus,
             landmarks.name landmarksName,
             diary.data diaryText
              from 
@@ -30,7 +31,10 @@ exports.todayTasks = async (ctx, next) => {
                        left join landmarks on task.landmarks_id=landmarks.id
                        left join program on task.program_id= program.id
                        left join diary on task.id=diary.task_id
-                       where task.program_id in (${programIds.map(() => '?').join(',')}) order by task.start_time `,
+                       where 
+                       task.program_id in (${programIds.map(() => '?').join(',')})
+                       and program.start_time is not null
+                       order by task.start_time `,
             programIds);
         if (!taskRes.error) {
             const tasks = taskRes.data;

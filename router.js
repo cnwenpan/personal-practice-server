@@ -23,6 +23,7 @@ router.post(schame+'/program/startUp',program.startUp)
 router.post(schame+'/landMasks/list',landMasks.list)
 router.post(schame+'/landMasks/add',landMasks.add)
 router.post(schame+'/landMasks/update',landMasks.update)
+
 //task
 router.post(schame+'/task/list',task.list)
 router.post(schame+'/task/add',task.add)

@@ -1,7 +1,11 @@
 exports.programList = `select * from program where user_id=?`;
 exports.programAdd = `insert into program(id,name,level,end_time,create_time,user_id) values(?,?,?,?,?,?)`;
 exports.programHas = `select id from program where name= ? `;
-exports.programDel = `delete from program where id= ? `;
+exports.programDel = `delete program,landmarks,task 
+                        from program
+                         left join landmarks on program.id=landmarks.program_id
+                         left join task on task.program_id=program.id 
+                         where program.id= ? `;
 exports.programDetail = `SELECT * FROM program WHERE id= `;
 exports.programUpdate = `update program set name = ?,level = ?,end_time= ? WHERE id = ? `;
 exports.programStartUp = `update program set start_time= ? WHERE id = ? `

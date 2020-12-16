@@ -5,6 +5,24 @@ exports.list = async (ctx, next) => {
     const {programId} = ctx.request.body;
     if (programId) {
         const {error, data} = await db.exec(sql.landMasksList, [programId]);
+        if (error) {
+            ctx.body = JSON.stringify({
+                success: false,
+                msg: data.toString()
+            })
+            next()
+            return
+        }
+
+        if (data.length === 0) {
+            ctx.body = JSON.stringify({
+                success: true,
+                data: []
+            })
+            next()
+            return
+        }
+
         const taskSql = `select * from task where landmarks_id in(${data.map(item => '?').join(',')}) order by start_time`
         const {error: taskError, data: taskData} = await db.exec(taskSql, data.map(item => item.id))
         if (!error && !taskError) {
