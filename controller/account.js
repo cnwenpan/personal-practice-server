@@ -37,7 +37,7 @@ exports.login = async (ctx, next) => {
                     'token',
                     token,
                     {
-                        domain: 'localhost',  // 写cookie所在的域名
+                        domain: '10.147.20.228',  // 写cookie所在的域名
                         path: '/',       // 写cookie所在的路径
                         maxAge: 1000 * 60 * 60 * 24 * 10, // cookie有效时长
                         // expires: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 10)),  // cookie失效时间
