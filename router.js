@@ -5,6 +5,7 @@ const task = require('./controller/task.js')
 const account = require('./controller/account')
 const landMasks = require('./controller/landMasks')
 const operate= require('./controller/operate')
+const diary= require('./controller/diary')
 
 const schame='/api'
 
@@ -30,6 +31,11 @@ router.post(schame+'/task/add',task.add)
 router.post(schame+'/task/update',task.update)
 router.post(schame+'/task/del',task.del)
 router.post(schame+'/task/updateStatus',task.updateStatus)
+
+//日记
+router.post(schame+'/diary/list',diary.list)
+router.post(schame+'/diary/add',diary.add);
+router.post(schame+'/diary/update',diary.update)
 
 //
 router.post(schame+'/today',operate.todayTasks)

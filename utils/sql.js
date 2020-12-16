@@ -25,3 +25,6 @@ exports.accountAdd = `insert into account(id,type,user_id,account,password,phone
 exports.landMasksList = `select * from landmarks where program_id=? order by end_time`;
 exports.landMasksAdd = `insert into landmarks(id,program_id,name,create_time,end_time) values(?,?,?,?,?)`
 exports.landMasksUpdate = `update landmarks set name = ?,end_time= ? WHERE id = ? `
+
+exports.diaryAdd=`insert into diary(id,task_id,data,create_time) values(?,?,?,?)`
+exports.diaryUpdate=`update diary set data = ? WHERE id = ? `

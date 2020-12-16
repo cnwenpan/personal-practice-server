@@ -25,7 +25,8 @@ exports.todayTasks = async (ctx, next) => {
             program.level level,
             program.start_time programStatus,
             landmarks.name landmarksName,
-            diary.data diaryText
+            diary.data diaryText,
+            diary.id diaryId
              from 
                        task 
                        left join landmarks on task.landmarks_id=landmarks.id
