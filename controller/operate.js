@@ -20,7 +20,8 @@ exports.todayTasks = async (ctx, next) => {
             task.program_id program_id,
             task.landmarks_id landmarks_id,
             task.time_of_day time_of_day,
-            task.status status,
+            status.id status,
+            status.create_time finish_time,
             program.name programName,
             program.level level,
             program.start_time programStatus,
@@ -31,10 +32,12 @@ exports.todayTasks = async (ctx, next) => {
                        task 
                        left join landmarks on task.landmarks_id=landmarks.id
                        left join program on task.program_id= program.id
+                       left join status on task.id=status.record_id
                        left join diary on task.id=diary.task_id
                        where 
                        task.program_id in (${programIds.map(() => '?').join(',')})
                        and program.start_time is not null
+                       
                        order by task.start_time `,
             programIds);
         if (!taskRes.error) {

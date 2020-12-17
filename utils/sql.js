@@ -28,3 +28,5 @@ exports.landMasksUpdate = `update landmarks set name = ?,end_time= ? WHERE id = 
 
 exports.diaryAdd=`insert into diary(id,task_id,data,create_time) values(?,?,?,?)`
 exports.diaryUpdate=`update diary set data = ? WHERE id = ? `
+
+exports.statusAdd=`insert into status(id,record_id,create_time) values(?,?,?)`

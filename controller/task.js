@@ -72,7 +72,7 @@ exports.add = async (ctx, next) => {
 
 
     // name,level,end_time,create_time,user_id
-    const {error, data} = await db.exec(sql.taskAdd, [name, new Date(startTime), Number(repeat),Number(time_of_day), Number(targets), description, new Date(), landMarkId,programId, 0])
+    const {error, data} = await db.exec(sql.taskAdd, [name, new Date(startTime), Number(repeat), Number(time_of_day), Number(targets), description, new Date(), landMarkId, programId, 0])
     if (error) {
         ctx.body = JSON.stringify({
             success: false,
@@ -157,7 +157,7 @@ exports.update = async (ctx, next) => {
 
 
     // name,level,end_time,create_time,user_id
-    const {error, data} = await db.exec(sql.taskUpdate, [name, new Date(startTime), Number(repeat),Number(time_of_day), Number(targets), description, id])
+    const {error, data} = await db.exec(sql.taskUpdate, [name, new Date(startTime), Number(repeat), Number(time_of_day), Number(targets), description, id])
     if (error) {
         ctx.body = JSON.stringify({
             success: false,
@@ -175,27 +175,51 @@ exports.update = async (ctx, next) => {
 
 exports.updateStatus = async (ctx, next) => {
     //状态默认未完成。
-    const {taskId, status = 0} = ctx.request.body;
-    if (taskId) {
-
-        const {error, data} = await db.exec('update task set status=? where id=?', [status, taskId])
-        if (!error) {
-            ctx.body = JSON.stringify({
-                success: true,
-                msg: '更新成功'
-            })
-
-        } else {
+    const {recordId} = ctx.request.body;
+    if (recordId) {
+        const {error: hasError, data: hasData} = await db.exec(`select * from status where record_id=? and DATEDIFF(create_time,now())=0`,[recordId])
+        if (hasError) {
             ctx.body = JSON.stringify({
                 success: false,
-                msg: data.toString()
+                msg: hasData.toString()
             })
+            next()
+            return
         }
+        if (hasData.length > 0) {
+            const {error:delError,data:delData}=await db.exec(`delete from status where id= ? and  DATEDIFF(create_time,now())=0`,[recordId])
+            if (!delError) {
+                ctx.body = JSON.stringify({
+                    success: true,
+                    msg: '更新成功'
+                })
+            }else{
+                ctx.body = JSON.stringify({
+                    success: false,
+                    msg: data.toString()
+                })
+            }
+        } else {
+            const {error, data} = await db.exec(sql.statusAdd, [recordId, new Date()])
+            if (!error) {
+                ctx.body = JSON.stringify({
+                    success: true,
+                    msg: '更新成功'
+                })
+
+            } else {
+                ctx.body = JSON.stringify({
+                    success: false,
+                    msg: data.toString()
+                })
+            }
+        }
+
 
     } else {
         ctx.body = JSON.stringify({
             success: false,
-            msg: 'taskId不能为空'
+            msg: '记录id不能为空'
         })
     }
     next()
