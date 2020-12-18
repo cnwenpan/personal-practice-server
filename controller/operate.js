@@ -8,6 +8,15 @@ exports.todayTasks = async (ctx, next) => {
     const programRes = await db.exec('select * from program where user_id=?', [ctx.state.account.user_id]);
 
     if (!programRes.error) {
+        if(programRes.data.length===0){
+            ctx.body = JSON.stringify({
+                success: true,
+                data: [],
+                msg: '今日任务加载成功'
+            })
+            next()
+            return
+        }
         const programIds = programRes.data.map(item => item.id);
         //所有项目下的任务
         const taskRes = await db.exec(
