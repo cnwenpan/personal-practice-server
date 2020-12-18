@@ -187,7 +187,7 @@ exports.updateStatus = async (ctx, next) => {
             return
         }
         if (hasData.length > 0) {
-            const {error:delError,data:delData}=await db.exec(`delete from status where id= ? and  DATEDIFF(create_time,now())=0`,[recordId])
+            const {error:delError,data:delData}=await db.exec(`delete from status where record_id= ? and  DATEDIFF(create_time,now())=0`,[recordId])
             if (!delError) {
                 ctx.body = JSON.stringify({
                     success: true,

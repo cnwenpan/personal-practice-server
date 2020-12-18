@@ -27,13 +27,14 @@ exports.todayTasks = async (ctx, next) => {
             program.start_time programStatus,
             landmarks.name landmarksName,
             diary.data diaryText,
+            diary.create_time diaryTime,
             diary.id diaryId
              from 
                        task 
                        left join landmarks on task.landmarks_id=landmarks.id
                        left join program on task.program_id= program.id
                        left join status on task.id=status.record_id
-                       left join diary on task.id=diary.task_id
+                       left join (select * from  diary where DATEDIFF(create_time,now())=0) as diary on task.id=diary.task_id
                        where 
                        task.program_id in (${programIds.map(() => '?').join(',')})
                        and program.start_time is not null
@@ -46,16 +47,16 @@ exports.todayTasks = async (ctx, next) => {
             //找出所有重复的任务。和不重复，时间是今天的任务
             let result = tasks.map(item => {
                 item.user_id = ctx.state.account.user_id;
+                const todayStart = moment(moment(new Date()).format('YYYY-MM-DD 00:00:00'));
+                const todayEnd = moment(moment(new Date()).format('YYYY-MM-DD 24:00:00'));
 
                 if (item.is_repeat === 1) {
+                    if(!item.diaryTime||moment(item.diaryTime).isBetween(todayStart,todayEnd)){
+                        return item
+                    }
 
-                    return item;
                 } else {
-
-                    const todayStart = moment(moment(new Date()).format('YYYY-MM-DD 00:00:00'));
-                    const todayEnd = moment(moment(new Date()).format('YYYY-MM-DD 24:00:00'));
                     if (moment(item.start_time).isBetween(todayStart, todayEnd)) {
-
                         return item;
                     }
                 }

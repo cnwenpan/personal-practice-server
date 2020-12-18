@@ -58,11 +58,11 @@ exports.update = async (ctx, next) => {
 
 exports.list = async (ctx, next) => {
     const {error, data} = await db.exec(`
-        select diary.data diaryText,program.name,program.level level,task.create_time time
+        select diary.data diaryText,program.name,program.level level,diary.create_time time
          from diary 
          left join task on diary.task_id=task.id
          left join program on task.program_id=program.id
-         where program.user_id=? order by task.create_time
+         where program.user_id=? order by diary.create_time desc
     `, [ctx.state.account.user_id]);
 
     if (error) {
