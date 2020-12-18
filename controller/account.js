@@ -27,6 +27,7 @@ exports.login = async (ctx, next) => {
             if (password === user.password) {
                 ctx.body = JSON.stringify({
                     success: true,
+                    data:{name:user.name,type:user.type,userId:user.user_id},
                     msg: '登录成功'
                 })
 
