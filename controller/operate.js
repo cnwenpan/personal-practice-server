@@ -29,6 +29,8 @@ exports.todayTasks = async (ctx, next) => {
             task.program_id program_id,
             task.landmarks_id landmarks_id,
             task.time_of_day time_of_day,
+            task.progress progress,
+            task.description description,
             status.id status,
             status.create_time finish_time,
             program.name programName,
@@ -52,29 +54,33 @@ exports.todayTasks = async (ctx, next) => {
             programIds);
         if (!taskRes.error) {
             const tasks = taskRes.data;
-
+            const todayStart = moment(moment(new Date()).format('YYYY-MM-DD 00:00:00'));
+            const todayEnd = moment(moment(new Date()).format('YYYY-MM-DD 24:00:00'));
             //找出所有重复的任务。和不重复，时间是今天的任务
-            let result = tasks.map(item => {
+            let repeatResult = tasks.map(item => {
                 item.user_id = ctx.state.account.user_id;
-                const todayStart = moment(moment(new Date()).format('YYYY-MM-DD 00:00:00'));
-                const todayEnd = moment(moment(new Date()).format('YYYY-MM-DD 24:00:00'));
+
 
                 if (item.is_repeat === 1) {
                     if(!item.diaryTime||moment(item.diaryTime).isBetween(todayStart,todayEnd)){
                         return item
                     }
 
-                } else {
-                    if (moment(item.start_time).isBetween(todayStart, todayEnd)) {
-                        return item;
-                    }
                 }
             })
-            result = result.filter(item => !!item).sort()
-            console.log(result)
+            let notRepeatResult=tasks.map(item=>{
+                if(item.is_repeat===0&&moment(item.start_time).isAfter(todayStart)){
+                    return item
+                }
+            })
+            notRepeatResult=notRepeatResult.filter(item=>!!item).sort()
+            repeatResult = repeatResult.filter(item => !!item).sort()
             ctx.body = JSON.stringify({
                 success: true,
-                data: result,
+                data: {
+                    repeatResult,
+                    notRepeatResult,
+                },
                 msg: '今日任务加载成功'
             })
         } else {
