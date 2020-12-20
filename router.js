@@ -31,6 +31,7 @@ router.post(schame+'/task/add',task.add)
 router.post(schame+'/task/update',task.update)
 router.post(schame+'/task/del',task.del)
 router.post(schame+'/task/updateStatus',task.updateStatus)
+router.post(schame+'/task/updateProgress',task.updateProgress)
 
 //日记
 router.post(schame+'/diary/list',diary.list)

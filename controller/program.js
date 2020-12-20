@@ -115,7 +115,7 @@ exports.del = async (ctx, next) => {
 exports.update = async (ctx, next) => {
     const {id, name, level, endTime} = ctx.request.body;
     if (id) {
-        const {error, data} = await db.exec(sql.programUpdate, [name, level, endTime, id])
+        const {error, data} = await db.exec(sql.programUpdate, [name, level, new Date(endTime), id])
         if (!error) {
             ctx.body = JSON.stringify({
                 success: true,
