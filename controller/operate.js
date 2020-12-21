@@ -8,7 +8,7 @@ exports.todayTasks = async (ctx, next) => {
     const programRes = await db.exec('select * from program where user_id=?', [ctx.state.account.user_id]);
 
     if (!programRes.error) {
-        if(programRes.data.length===0){
+        if (programRes.data.length === 0) {
             ctx.body = JSON.stringify({
                 success: true,
                 data: [],
@@ -44,7 +44,7 @@ exports.todayTasks = async (ctx, next) => {
                        task 
                        left join landmarks on task.landmarks_id=landmarks.id
                        left join program on task.program_id= program.id
-                       left join status on task.id=status.record_id
+                       left join (select * from status where DATEDIFF(create_time,now())=0) as status on task.id=status.record_id
                        left join (select * from  diary where DATEDIFF(create_time,now())=0) as diary on task.id=diary.task_id
                        where 
                        task.program_id in (${programIds.map(() => '?').join(',')})
@@ -62,18 +62,18 @@ exports.todayTasks = async (ctx, next) => {
 
 
                 if (item.is_repeat === 1) {
-                    if(!item.diaryTime||moment(item.diaryTime).isBetween(todayStart,todayEnd)){
+                    if (!item.diaryTime || moment(item.diaryTime).isBetween(todayStart, todayEnd)) {
                         return item
                     }
 
                 }
             })
-            let notRepeatResult=tasks.map(item=>{
-                if(item.is_repeat===0&&moment(item.start_time).isAfter(todayStart)){
+            let notRepeatResult = tasks.map(item => {
+                if (item.is_repeat === 0 && moment(item.start_time).isAfter(todayStart)) {
                     return item
                 }
             })
-            notRepeatResult=notRepeatResult.filter(item=>!!item).sort()
+            notRepeatResult = notRepeatResult.filter(item => !!item).sort()
             repeatResult = repeatResult.filter(item => !!item).sort()
             ctx.body = JSON.stringify({
                 success: true,
