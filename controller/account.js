@@ -25,14 +25,19 @@ exports.login = async (ctx, next) => {
             const user = data[0]
             //对比密码
             if (password === user.password) {
+                //加密
+                const token = jwt.sign({
+                    account: user.account,
+                    name: user.name,
+                    type: user.type,
+                    user_id: user.user_id
+                }, secret)
                 ctx.body = JSON.stringify({
                     success: true,
-                    data:{name:user.name,type:user.type,userId:user.user_id},
+                    data: {name: user.name, type: user.type, userId: user.user_id, token},
                     msg: '登录成功'
                 })
 
-                //加密
-                const token= jwt.sign({account: user.account, name: user.name, type: user.type,user_id:user.user_id}, secret)
                 //下发用户凭证
                 ctx.cookies.set(
                     'token',
