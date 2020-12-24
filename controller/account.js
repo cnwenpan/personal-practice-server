@@ -72,8 +72,16 @@ exports.login = async (ctx, next) => {
 }
 
 exports.register = async (ctx, next) => {
-    const {account, password, phone = '', email = '', nikName = '', name = ''} = ctx.request.body;
+    const {account, password, phone = '', email = '', nikName = '', name = '',accessCode=''} = ctx.request.body;
 
+    if(!accessCode){
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: '需要邀请码才能注册'
+        })
+        next()
+        return
+    }
     // 检查账号
     if (!account) {
         ctx.body = JSON.stringify({
@@ -91,6 +99,38 @@ exports.register = async (ctx, next) => {
         next()
         return
     }
+
+    const {error:accessError,data:accessData}= await db.exec('select * from register_access_code where id=?',[accessCode]);
+
+    //数据库错误
+    if(accessError){
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: accessData.toString()
+        })
+        next()
+        return
+    }
+    // 不存在
+    if(accessData.length===0){
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: '邀请码不存在'
+        })
+        next()
+        return
+    }
+
+    //存在，已使用
+    if(!!accessData[0]['status']){
+        ctx.body = JSON.stringify({
+            success: false,
+            msg: '邀请码已使用'
+        })
+        next()
+        return
+    }
+
     //type,user_id,account,password,phone,email,nikName,name,create_time
     const {error, data} = await db.exec(sql.accountAdd, [1, new Date().getTime(), account, password, phone, email, nikName, name, new Date()]);
 
@@ -100,6 +140,7 @@ exports.register = async (ctx, next) => {
             msg: data.toString()
         })
     } else {
+        const {error:statusError,data:statusData}=await db.exec('update register_access_code set status = 1 WHERE id = ?',[accessCode])
 
         ctx.body = JSON.stringify({
             success: true,
