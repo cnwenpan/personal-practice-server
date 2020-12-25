@@ -34,7 +34,7 @@ app.use(async (ctx, next) => {
     if (whiteInventory.indexOf(requestUrl) > -1) {
         await next()
     } else {
-        const token = ctx.cookies.get('token')||ctx.request.headers.get('token')
+        const token = ctx.cookies.get('token')||ctx.request.headers['token']
         if (!token) {
             ctx.body = JSON.stringify({
                 code: 1001,
