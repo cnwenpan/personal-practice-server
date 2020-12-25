@@ -69,7 +69,7 @@ exports.todayTasks = async (ctx, next) => {
                 }
             })
             let notRepeatResult = tasks.map(item => {
-                if (item.is_repeat === 0 && moment(item.start_time).isAfter(todayStart)) {
+                if (item.is_repeat === 0) {
                     return item
                 }
             })
