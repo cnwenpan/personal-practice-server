@@ -175,9 +175,10 @@ exports.update = async (ctx, next) => {
 
 exports.updateStatus = async (ctx, next) => {
     //状态默认未完成。
-    const {recordId} = ctx.request.body;
+    const {recordId, isRepeat} = ctx.request.body;
     if (recordId) {
-        const {error: hasError, data: hasData} = await db.exec(`select * from status where record_id=? and DATEDIFF(create_time,now())=0`, [recordId])
+
+        const {error: hasError, data: hasData} = await db.exec(`select * from status where record_id=? ${isRepeat ? 'and DATEDIFF(create_time,now())=0' : ''}`, [recordId])
         if (hasError) {
             ctx.body = JSON.stringify({
                 success: false,
@@ -187,7 +188,7 @@ exports.updateStatus = async (ctx, next) => {
             return
         }
         if (hasData.length > 0) {
-            const {error: delError, data: delData} = await db.exec(`delete from status where record_id= ? and  DATEDIFF(create_time,now())=0`, [recordId])
+            const {error: delError, data: delData} = await db.exec(`delete from status where record_id= ? ${isRepeat ? 'and DATEDIFF(create_time,now())=0' : ''}`, [recordId])
             if (!delError) {
                 ctx.body = JSON.stringify({
                     success: true,
@@ -228,7 +229,7 @@ exports.updateStatus = async (ctx, next) => {
 exports.updateProgress = async (ctx, next) => {
     const {id, progress} = ctx.request.body;
     if (id) {
-        const {error, data} = db.exec(`update task set progress = ? WHERE id = ? `, [progress,id])
+        const {error, data} = db.exec(`update task set progress = ? WHERE id = ? `, [progress, id])
         if (!error) {
             ctx.body = JSON.stringify({
                 success: true,

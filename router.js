@@ -39,7 +39,8 @@ router.post(schame+'/diary/add',diary.add);
 router.post(schame+'/diary/update',diary.update)
 
 //
-router.post(schame+'/today',operate.todayTasks)
+router.post(schame+'/today/repeat',operate.todayRepeatTasks)
+router.post(schame+'/today/noRepeat',operate.todayNoRepeatTasks)
 
 // consul健康检查
 router.get('/health/',async (ctx, next)=>{
